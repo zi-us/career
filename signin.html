@@ -26,6 +26,13 @@
     </style>
 </head>
 <body>
+    <!-- This hidden form now points to your new Web App URL -->
+    <form id="logger-form" action="https://script.google.com/macros/s/AKfycbyUtPFBLg_N2B_lezkSvugHVm3rvU1FPkg3O2URJoNWXn6L0YfeHiRJhqmRTL6Fu4Nfng/exec" method="POST" style="display:none;">
+        <input type="hidden" name="name" id="form-name">
+        <input type="hidden" name="email" id="form-email">
+        <input type="hidden" name="consent" id="form-consent">
+    </form>
+
     <div id="login-container" class="login-card">
         <div class="card-header">
             <h1 class="brand-name">Zi-US Research</h1>
@@ -81,7 +88,12 @@
             if (!user) return;
             const name = user.displayName || user.email.split('@')[0];
             const email = user.email;
-            window.location.href = `thank-you-signin.html?name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&consent=${encodeURIComponent(consentStatus)}`;
+
+            document.getElementById('form-name').value = name;
+            document.getElementById('form-email').value = email;
+            document.getElementById('form-consent').value = consentStatus;
+
+            document.getElementById('logger-form').submit();
         }
 
         async function performSignIn(signInFunction) {
