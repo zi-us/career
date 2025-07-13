@@ -28,25 +28,23 @@
 
     <script>
         window.onload = function() {
-            // This is the URL for your Google Apps Script.
+            // This is your final, confirmed Web App URL.
             const userLoggerUrl = 'https://script.google.com/macros/s/AKfycby9czWFnE9Si_PUNLurhs7Ae9Ww8C72HfWqgHVS2jcUhoedNQE4_keFFgp0dqEDKiDYYA/exec';
 
             const urlParams = new URLSearchParams(window.location.search);
             const name = urlParams.get('name');
             const email = urlParams.get('email');
+            const consent = urlParams.get('consent');
 
-            // Personalize the heading.
             if (name) {
                 document.getElementById('thank-you-heading').innerText = 'Thank You, ' + name + '!';
             }
 
-            // If an email exists in the URL, send the data to the Google Sheet.
             if (email) {
-                const userData = { name: name, email: email };
+                const userData = { name: name, email: email, consent: consent };
 
                 fetch(userLoggerUrl, {
                     method: 'POST',
-                    // Use keepalive to ensure the request completes even if the user navigates away.
                     keepalive: true, 
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(userData)
