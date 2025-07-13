@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign In | Zi-US Research</title>
-    <meta name="description" content="Sign in to the Zi-US Research Platform.">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500&display=swap');
         :root { --primary: #000; --secondary: #1a1a1a; --accent: #0066ff; --danger: #ff3366; --gray-100: #f8f9fa; --gray-200: #e9ecef; --gray-600: #6c757d; }
@@ -22,8 +21,6 @@
         .btn-secondary { background: white; color: var(--primary); border: 1px solid var(--gray-200); }
         .divider { display: flex; align-items: center; text-align: center; color: var(--gray-600); font-size: 1rem; margin: 2.5rem 0; }
         .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--gray-200); }
-        .divider:not(:empty)::before { margin-right: 1em; }
-        .divider:not(:empty)::after { margin-left: 1em; }
         .social-btn svg { width: 18px; height: 18px; }
         #error-message { color: var(--danger); font-size: 1.1rem; text-align: center; margin-top: 1.5rem; display: none; }
     </style>
@@ -32,7 +29,7 @@
     <div id="login-container" class="login-card">
         <div class="card-header">
             <h1 class="brand-name">Zi-US Research</h1>
-            <p class="card-subtitle">Sign in to access your dashboard</p>
+            <p class="card-subtitle">Create an account or sign in</p>
         </div>
         <div class="form-group">
             <input type="email" id="email-input" placeholder="Email Address" class="form-input" required>
@@ -72,19 +69,19 @@
         const passwordInput = document.getElementById('password-input');
         const errorMessage = document.getElementById('error-message');
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const consentStatus = urlParams.get('consent');
+
         function showError(message) {
-            const friendlyMessage = message.replace('Firebase: ', '').replace(/ \(auth\/.*\)\.$/, '.');
-            errorMessage.textContent = friendlyMessage;
+            errorMessage.textContent = message.replace('Firebase: ', '').replace(/ \(auth\/.*\)\.$/, '.');
             errorMessage.style.display = 'block';
         }
 
-        // This function now ONLY redirects with the user's details in the URL.
         function handleAuthSuccess(user) {
             if (!user) return;
             const name = user.displayName || user.email.split('@')[0];
             const email = user.email;
-            // The URL now contains the data needed for the next page.
-            window.location.href = `thank-you-signin.html?name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
+            window.location.href = `thank-you-signin.html?name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&consent=${encodeURIComponent(consentStatus)}`;
         }
 
         async function performSignIn(signInFunction) {
