@@ -28,30 +28,11 @@
 
     <script>
         window.onload = function() {
-            // This is your final, confirmed Web App URL.
-            const userLoggerUrl = 'https://script.google.com/macros/s/AKfycby9czWFnE9Si_PUNLurhs7Ae9Ww8C72HfWqgHVS2jcUhoedNQE4_keFFgp0dqEDKiDYYA/exec';
-
             const urlParams = new URLSearchParams(window.location.search);
             const name = urlParams.get('name');
-            const email = urlParams.get('email');
-            const consent = urlParams.get('consent');
 
             if (name) {
                 document.getElementById('thank-you-heading').innerText = 'Thank You, ' + name + '!';
-            }
-
-            if (email) {
-                const userData = { name: name, email: email, consent: consent };
-
-                fetch(userLoggerUrl, {
-                    method: 'POST',
-                    keepalive: true, 
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(userData)
-                })
-                .then(response => response.json())
-                .then(data => console.log('Google Sheet Log Response:', data))
-                .catch(err => console.error("Error sending user data to Google Sheet:", err));
             }
         };
     </script>
