@@ -230,28 +230,39 @@
             errorMessage.style.display = 'block';
         }
 
+        // This function sends user data to your Google Sheet
         function logUserToSheet(user) {
             const userData = {
                 name: user.displayName,
                 email: user.email
             };
 
+            // ** FIX: Removed `mode: 'no-cors'` **
+            // This allows the Content-Type header to be sent correctly,
+            // which the Google Apps Script needs to parse the JSON data.
             fetch(userLoggerUrl, {
                 method: 'POST',
-                mode: 'no-cors', 
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(userData)
-            }).catch(err => console.error("Error sending user data to Google Sheet:", err));
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Log success or failure from the script for debugging
+                console.log('Google Sheet Log Response:', data);
+            })
+            .catch(err => {
+                console.error("Error sending user data to Google Sheet:", err)
+            });
         }
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
+                // Log the user's details to the Google Sheet
                 logUserToSheet(user);
                 
-                // --- UPDATED REDIRECT ---
-                // Redirects to the new thank you page with the user's name
+                // Redirect to the thank you page after attempting to log the user
                 const userName = user.displayName || user.email.split('@')[0];
                 window.location.href = `thank-you-signin.html?name=${encodeURIComponent(userName)}`;
             }
