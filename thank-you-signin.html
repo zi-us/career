@@ -46,6 +46,8 @@
 
                 fetch(userLoggerUrl, {
                     method: 'POST',
+                    // Use keepalive to ensure the request completes even if the user navigates away.
+                    keepalive: true, 
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(userData)
                 })
