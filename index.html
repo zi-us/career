@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authorization | Zi-US Research</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500&display=swap');
+        :root { --primary: #000; --secondary: #1a1a1a; --accent: #0066ff; --gray-100: #f8f9fa; --gray-200: #e9ecef; --gray-600: #6c757d; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { font-size: 62.5%; }
+        body { font-family: 'Calibri Light', 'Inter', sans-serif; font-weight: 300; font-size: 1.4rem; line-height: 1.6; color: var(--primary); background: var(--gray-100); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; }
+        .auth-card { background: white; border: 1px solid var(--gray-200); width: 100%; max-width: 500px; padding: 4rem 3.5rem; text-align: center; }
+        .card-header { margin-bottom: 2.5rem; }
+        .brand-name { font-size: 2.2rem; font-weight: 400; letter-spacing: 0.05em; margin-bottom: 0.8rem; }
+        .card-subtitle { font-size: 1.6rem; color: var(--gray-600); }
+        .consent-section { margin-top: 3rem; text-align: left; font-size: 1.3rem; color: var(--gray-600); display: flex; align-items: center; gap: 1rem; justify-content: center; }
+        #consent-checkbox { width: 1.6rem; height: 1.6rem; }
+        .btn { display: block; width: 100%; padding: 1.4rem; margin-top: 3rem; font-size: 1.4rem; font-weight: 500; text-align: center; cursor: pointer; text-decoration: none; border-radius: 0.2rem; background: var(--primary); color: white; border: 1px solid var(--primary); transition: background-color 0.2s, border-color 0.2s; }
+        .btn:disabled { background: var(--gray-200); border-color: var(--gray-200); color: var(--gray-600); cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <div class="card-header">
+            <h1 class="brand-name">Zi-US Research</h1>
+            <p class="card-subtitle">Authorization Required</p>
+        </div>
+        <p>To proceed, please acknowledge that you agree to our terms of service and privacy policy. By signing in, you consent to the collection and processing of your data as described.</p>
+        
+        <div class="consent-section">
+            <input type="checkbox" id="consent-checkbox">
+            <label for="consent-checkbox">I agree and wish to proceed.</label>
+        </div>
+
+        <button id="proceed-button" class="btn" disabled>Proceed to Sign In</button>
+    </div>
+
+    <script>
+        const consentCheckbox = document.getElementById('consent-checkbox');
+        const proceedButton = document.getElementById('proceed-button');
+
+        // Enable or disable the button based on the checkbox state
+        consentCheckbox.addEventListener('change', function() {
+            proceedButton.disabled = !this.checked;
+        });
+
+        // When the button is clicked, redirect to the sign-in page
+        proceedButton.addEventListener('click', function() {
+            if (!this.disabled) {
+                window.location.href = 'signin.html';
+            }
+        });
+    </script>
+</body>
+</html>
