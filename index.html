@@ -203,7 +203,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyCgij7wgkirr2k2pnyspISqeLexXWDSC44",
@@ -222,21 +222,22 @@
         const passwordInput = document.getElementById('password-input');
         const errorMessage = document.getElementById('error-message');
 
-        // =================================================================================
-        //
-        // FINAL URL PASTED BELOW
-        //
         const userLoggerUrl = 'https://script.google.com/macros/s/AKfycby9czWFnE9Si_PUNLurhs7Ae9Ww8C72HfWqgHVS2jcUhoedNQE4_keFFgp0dqEDKiDYYA/exec'; 
-        //
-        // =================================================================================
-
 
         function showError(message) {
-            errorMessage.textContent = message;
+            // Make Firebase errors more readable for the user
+            const friendlyMessage = message.replace('Firebase: ', '').replace(/ \(auth\/.*\)\.$/, '.');
+            errorMessage.textContent = friendlyMessage;
             errorMessage.style.display = 'block';
         }
 
-        function logUserAndRedirect(user) {
+        // This function is now the single point of action after a successful login.
+        function handleAuthSuccess(user) {
+            if (!user) {
+                showError("An unexpected authentication error occurred. Please try again.");
+                return;
+            }
+
             const userData = {
                 name: user.displayName,
                 email: user.email
@@ -244,12 +245,8 @@
             const userName = user.displayName || user.email.split('@')[0];
             const redirectUrl = `thank-you-signin.html?name=${encodeURIComponent(userName)}`;
 
-            if (userLoggerUrl === 'PASTE_YOUR_GOOGLE_SCRIPT_WEB_APP_URL_HERE') {
-                console.error("CRITICAL: userLoggerUrl is not set. Redirecting without logging to Google Sheet.");
-                window.location.href = redirectUrl;
-                return;
-            }
-
+            // We will redirect regardless of whether the logging succeeds or fails,
+            // to ensure the user isn't stuck on the login page.
             fetch(userLoggerUrl, {
                 method: 'POST',
                 headers: {
@@ -262,46 +259,47 @@
                 console.log('Google Sheet Log Response:', data);
             })
             .catch(err => {
+                // Log the error for debugging, but don't block the user.
                 console.error("Error sending user data to Google Sheet:", err);
             })
             .finally(() => {
+                // This redirect happens after the fetch is complete (success or fail).
                 window.location.href = redirectUrl;
             });
         }
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                logUserAndRedirect(user);
-            }
-        });
+        // The onAuthStateChanged listener has been removed from this page
+        // to prevent race conditions. The logic is now directly tied to button clicks.
 
-        async function signInWithProvider(provider) {
-            try {
-                await signInWithPopup(auth, provider);
-            } catch (e) {
-                showError(e.message);
-            }
-        }
-        
         document.getElementById('email-signup-button').addEventListener('click', async () => {
             try {
                 errorMessage.style.display = 'none';
-                await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+                const userCredential = await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+                handleAuthSuccess(userCredential.user); // Call the handler on success
             } catch (e) {
                 showError(e.message);
             }
         });
-        
+
         document.getElementById('email-login-button').addEventListener('click', async () => {
             try {
                 errorMessage.style.display = 'none';
-                await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+                const userCredential = await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+                handleAuthSuccess(userCredential.user); // Call the handler on success
             } catch (e) {
                 showError(e.message);
             }
         });
-        
-        document.getElementById('google-login-button').addEventListener('click', () => signInWithProvider(new GoogleAuthProvider()));
+
+        document.getElementById('google-login-button').addEventListener('click', async () => {
+            try {
+                errorMessage.style.display = 'none';
+                const userCredential = await signInWithPopup(auth, new GoogleAuthProvider());
+                handleAuthSuccess(userCredential.user); // Call the handler on success
+            } catch (e) {
+                showError(e.message);
+            }
+        });
         
     </script>
 </body>
