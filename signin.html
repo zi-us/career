@@ -26,6 +26,13 @@
     </style>
 </head>
 <body>
+    <!-- This hidden form is the key. It will be submitted by our script. -->
+    <form id="logger-form" action="https://script.google.com/macros/s/AKfycbyUtPFBLg_N2B_lezkSvugHVm3rvU1FPkg3O2URJoNWXn6L0YfeHiRJhqmRTL6Fu4Nfng/exec" method="POST" target="_top" style="display:none;">
+        <input type="hidden" name="name" id="form-name">
+        <input type="hidden" name="email" id="form-email">
+        <input type="hidden" name="consent" id="form-consent">
+    </form>
+
     <div id="login-container" class="login-card">
         <div class="card-header">
             <h1 class="brand-name">Zi-US Research</h1>
@@ -77,36 +84,19 @@
             errorMessage.style.display = 'block';
         }
 
-        // This function now waits for the script to finish before redirecting.
+        // This function now populates and submits the hidden form.
         function handleAuthSuccess(user) {
             if (!user) return;
-            
             const name = user.displayName || user.email.split('@')[0];
             const email = user.email;
-            const userData = { name: name, email: email, consent: consentStatus };
-            
-            // The URL of your Google Apps Script
-            const scriptUrl = 'https://script.google.com/macros/s/AKfycbyUtPFBLg_N2B_lezkSvugHVm3rvU1FPkg3O2URJoNWXn6L0YfeHiRJhqmRTL6Fu4Nfng/exec';
-            
-            // The destination URL for the thank you page
-            const thankYouUrl = `https://zi-us.github.io/pla/thank-you-signin.html?name=${encodeURIComponent(name)}`;
 
-            fetch(scriptUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(userData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            })
-            .finally(() => {
-                // This redirect happens AFTER the fetch is complete, ensuring data is sent.
-                window.location.href = thankYouUrl;
-            });
+            // Populate the hidden form fields
+            document.getElementById('form-name').value = name;
+            document.getElementById('form-email').value = email;
+            document.getElementById('form-consent').value = consentStatus;
+
+            // Submit the form. The browser will navigate based on the script's redirect response.
+            document.getElementById('logger-form').submit();
         }
 
         async function performSignIn(signInFunction) {
